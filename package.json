@@ -13,7 +13,7 @@
     "chai": "~1.6.0"
   },
   "scripts": {
-    "test": "node_modules/.bin/karma"
+    "test": "node_modules/.bin/karma start"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-<element name="jpka-smart-post">
+<element name="jpka-smart-post" attributes="model">
   <template>
     <style>
       @host {}
@@ -7,7 +7,16 @@
   </template>
   <script>
     Polymer.register(this, {
-      model: {}
+      _model: {},
+      set model(model) {
+        if (typeof model === "string") {
+          model = JSON.parse(model);
+        }
+        this._model = model;
+      },
+      get model() {
+        return this._model;
+      }
     });
   </script>
 </element>
