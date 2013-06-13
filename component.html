@@ -1,0 +1,20 @@
+<element name="smart-post" attributes="model editable" style="display:inline-block;" onmouseover="editModeOn()" onmouseout="editModeOff()" >
+  <template>
+    <style>
+      .body {
+        display: block;
+        width: 200px;
+        height: 200px;
+        border: 5px solid black;
+        padding: 5px;
+      }
+    </style>  
+    <div id="body" class="body"></div>
+    <textarea id="editableBody" class="body" style="display:none;"></textarea>
+  </template>
+  <script>
+    @@script
+
+    Polymer.register(this, require("proto"));
+  </script>
+</element>
