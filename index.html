@@ -1,14 +1,32 @@
-<element name="smart-post" attributes="model editable" style="display:inline-block;" onmouseover="editModeOn()" onmouseout="editModeOff()" >
+<element name="smart-post" attributes="model editable" onmouseover="editModeOn()" onmouseout="editModeOff()" >
   <template>
     <style>
+      @host {
+        * {
+          position: relative;
+          display: block;
+          width: 600px;
+          height: 400px;
+          margin: 10px;
+        }
+      }
       .body {
-        display: block;
-        width: 200px;
-        height: 200px;
-        border: 5px solid black;
         padding: 5px;
+        width: 586px;
+        height: 386px;
+        border: 2px solid black;
+      }
+      #remove {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        background: none;
+        border: none;
+        font-size: 15px;
+        cursor: pointer;
       }
     </style>  
+    <button id="remove">X</button>
     <div id="body" class="body"></div>
     <textarea id="editableBody" class="body" style="display:none;"></textarea>
   </template>
@@ -21,16 +39,16 @@ module.exports = {
 
   ready: function() {
     this.$.editableBody.addEventListener("keyup", this.updateBody.bind(this));
+    this.$.remove.addEventListener("click", this.remove.bind(this));
   },
 
   set model(model) {
     if (typeof model === "string") {
       model = JSON.parse(model);
     }
-    this.$.body.innerHTML = this.parse(model.body);
-    this.$.editableBody.innerText = model.body;
-  
     this._model = model;
+    this.parseBody();
+    this.$.editableBody.innerText = model.body;
   },
   get model() {
     return this._model;
@@ -49,9 +67,17 @@ module.exports = {
     this.$.body.style.display = "block"; 
     this.onEditMode = false;
   },
+  parseBody: function() {
+    this.$.body.innerHTML = this._model.body ? this.parse(this._model.body) : "";
+  },
   updateBody: function() {
     this.model.body = this.$.editableBody.value;
-    this.$.body.innerHTML = this.parse(this.model.body);
+    this.parseBody();
+  },
+  remove: function() {
+    if (!this.parentNode) return;
+    this.parentNode.removeChild(this);
+    this.dispatchEvent(new CustomEvent("remove"));
   }
 };
 

@@ -70,4 +70,17 @@ describe("smart-post", function() {
       expect(element.$.editableBody.style.display).to.equal("none");
     });
   });
+
+  it("has a remove button on it's corner that removes it from the DOM and triggers a remove event", function(done) {
+    var click = document.createEvent("MouseEvents");
+    click.initEvent("click", true, false);
+    document.body.appendChild(element);
+
+    expect(element.$.remove).to.exist;
+    element.addEventListener("remove", function() {
+      expect(element.parentNode).to.not.exist;
+      done();
+    });
+    element.$.remove.dispatchEvent(click);
+  });
 });

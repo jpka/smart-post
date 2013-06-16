@@ -3,16 +3,16 @@ module.exports = {
 
   ready: function() {
     this.$.editableBody.addEventListener("keyup", this.updateBody.bind(this));
+    this.$.remove.addEventListener("click", this.remove.bind(this));
   },
 
   set model(model) {
     if (typeof model === "string") {
       model = JSON.parse(model);
     }
-    this.$.body.innerHTML = this.parse(model.body);
-    this.$.editableBody.innerText = model.body;
-  
     this._model = model;
+    this.parseBody();
+    this.$.editableBody.innerText = model.body;
   },
   get model() {
     return this._model;
@@ -31,8 +31,16 @@ module.exports = {
     this.$.body.style.display = "block"; 
     this.onEditMode = false;
   },
+  parseBody: function() {
+    this.$.body.innerHTML = this._model.body ? this.parse(this._model.body) : "";
+  },
   updateBody: function() {
     this.model.body = this.$.editableBody.value;
-    this.$.body.innerHTML = this.parse(this.model.body);
+    this.parseBody();
+  },
+  remove: function() {
+    if (!this.parentNode) return;
+    this.parentNode.removeChild(this);
+    this.dispatchEvent(new CustomEvent("remove"));
   }
 };
