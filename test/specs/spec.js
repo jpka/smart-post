@@ -1,9 +1,10 @@
 describe("smart-post", function() {  
-  var element;
+  var element,
+  model = {body: "#title\nsome text"};
 
   beforeEach(function() {
     element = fixtures.window().document.createElement("smart-post");
-    element.model = {body: "#body"};
+    element.model = model;
   });
 
   it("contains a body", function() {
@@ -16,31 +17,46 @@ describe("smart-post", function() {
   });
 
   it("editable-body has the markdown source and body has the processed html", function() {
-    expect(element.$.editableBody.value).to.equal("#body");
-    expect(element.$.body.innerHTML).to.contain("<h1");
+    expect(element.$.editableBody.value).to.equal(model.body);
+    expect(element.$.body.innerHTML).to.equal(element.parse(model.body));
   });
 
-  it("editable-body updates model when changed and body renders with new markdown source", function() {
-    var newBody = "#new body",
-    keyPress = document.createEvent("KeyboardEvent");
-    keyPress.initEvent("keyup", true, false);
+  describe("save button", function() {
+    it("isn't visible at first", function() {
+      expect(element.$.save.style.display).to.equal("none");
+    });
 
-    element.$.editableBody.innerText = newBody;
-    element.$.editableBody.style.display = "block";
-    element.$.editableBody.dispatchEvent(keyPress);
+    it("appears when keyup happens in textarea", function() {
+      var keyUp = fixtures.window().document.createEvent("KeyboardEvent");
+      keyUp.initEvent("keyup", true, false);
+      element.$.editableBody.dispatchEvent(keyUp);
+      expect(element.$.save.style.display).to.not.equal("none");
+    });
 
-    expect(element.model.body).to.equal(newBody);
-    expect(element.$.body.innerHTML).to.equal(element.parse(newBody));
+    it("saves to model when is pressed, and disappears", function() {
+      var newBody = "#new body",
+      click = fixtures.window().document.createEvent("MouseEvents");
+      click.initEvent("click", true, false);
+
+      element.$.editableBody.value = newBody;
+      element.$.save.dispatchEvent(click);
+      expect(element.model.body).to.equal(newBody);
+      expect(element.$.save.style.display).to.equal("none");
+    });
   });
 
-  it("can be instantiated with model as an attribute", function() {
+  it("can be instantiated with model as a JSON string attribute", function() {
     element = fixtures.window().document.querySelector("#post");
-    expect(element.model).to.exist.and.to.deep.equal({body: "#body"});
+    expect(element.model).to.exist.and.to.deep.equal(model);
   });
 
   describe("on hover", function() {
-    var mouseOver = document.createEvent("MouseEvents");
-    mouseOver.initEvent("mouseover", true, false);
+    var mouseOver;
+
+    beforeEach(function() {
+      mouseOver = fixtures.window().document.createEvent("MouseEvents");
+      mouseOver.initEvent("mouseover", true, false);
+    });
 
     it("doesn't do anything if the user isn't the owner", function() {
       element.editable = false;
@@ -59,25 +75,28 @@ describe("smart-post", function() {
     });
 
     it("reverses the situation and processes the markdown when mouse leaves", function() {
-      var mouseOut = document.createEvent("MouseEvents");
-
+      var mouseOut = fixtures.window().document.createEvent("MouseEvents"),
+      newBody = "#new body";
       mouseOut.initEvent("mouseout", true, false);
+
       element.editable = true;
       element.dispatchEvent(mouseOver);
+      element.$.editableBody.value = newBody;
       element.dispatchEvent(mouseOut);
 
       expect(element.$.body.style.display).to.not.equal("none");
       expect(element.$.editableBody.style.display).to.equal("none");
+      expect(element.$.body.innerHTML).to.equal(element.parse(newBody));
     });
   });
 
   describe("remove button", function() {
 
     it("removes it from the DOM and triggers a remove event", function(done) {
-      element.editable = true;
-      var click = document.createEvent("MouseEvents");
+      var click = fixtures.window().document.createEvent("MouseEvents");
       click.initEvent("click", true, false);
-      document.body.appendChild(element);
+      element.editable = true;
+      fixtures.window().document.body.appendChild(element);
 
       expect(element.$.remove.style.display).to.not.equal("none");
       element.addEventListener("remove", function() {

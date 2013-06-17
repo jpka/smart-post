@@ -2,8 +2,14 @@ module.exports = {
   _model: {},
 
   ready: function() {
-    this.$.editableBody.addEventListener("keyup", this.updateBody.bind(this));
+    var self = this;
+    this.$.editableBody.addEventListener("keyup", function() {
+      self.$.save.style.display = "block";
+    });
+    this.$.save.addEventListener("click", this.save.bind(this));
     this.$.remove.addEventListener("click", this.remove.bind(this));
+    this.addEventListener("mouseover", this.editModeOn);
+    this.addEventListener("mouseout", this.editModeOff);
   },
 
   set model(model) {
@@ -11,8 +17,8 @@ module.exports = {
       model = JSON.parse(model);
     }
     this._model = model;
+    this.$.editableBody.value = model.body;
     this.parseBody();
-    this.$.editableBody.innerText = model.body;
   },
   get model() {
     return this._model;
@@ -41,18 +47,20 @@ module.exports = {
     if (!this.onEditMode) return;
     this.$.editableBody.style.display = "none"; 
     this.$.body.style.display = "block"; 
+    this.parseBody();
     this.onEditMode = false;
   },
   parseBody: function() {
-    this.$.body.innerHTML = this._model.body ? this.parse(this._model.body) : "";
-  },
-  updateBody: function() {
-    this.model.body = this.$.editableBody.value;
-    this.parseBody();
+    this.$.body.innerHTML = this.parse(this.$.editableBody.value);
   },
   remove: function() {
     if (!this.parentNode) return;
     this.parentNode.removeChild(this);
     this.dispatchEvent(new CustomEvent("remove"));
+  },
+  save: function() {
+    this._model.body = this.$.editableBody.value;
+    this.$.save.style.display = "none";
+    this.dispatchEvent(new CustomEvent("save"));
   }
 };

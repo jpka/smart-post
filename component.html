@@ -1,4 +1,4 @@
-<element name="smart-post" attributes="model editable" onmouseover="editModeOn()" onmouseout="editModeOff()" >
+<element name="smart-post" attributes="model editable">
   <template>
     <style>
       @host {
@@ -16,20 +16,26 @@
         height: 386px;
         border: 2px solid black;
       }
-      #remove {
-        display: none;
+      button {
         position: absolute;
-        top: 0px;
-        right: 0px;
         background: none;
         border: none;
-        font-size: 15px;
         cursor: pointer;
       }
+      #save {
+        bottom: 5px;
+        right: 0px;
+      }
+      #remove {
+        top: 0px;
+        right: 0px;
+        font-size: 15px;
+      }
     </style>  
-    <button id="remove">X</button>
+    <button id="remove" style="display:none;">X</button>
     <div id="body" class="body"></div>
     <textarea id="editableBody" class="body" style="display:none;"></textarea>
+    <button id="save" style="display:none;">Save</button>
   </template>
   <script>
     @@script

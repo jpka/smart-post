@@ -1,4 +1,4 @@
-<element name="smart-post" attributes="model editable" onmouseover="editModeOn()" onmouseout="editModeOff()" >
+<element name="smart-post" attributes="model editable">
   <template>
     <style>
       @host {
@@ -16,20 +16,26 @@
         height: 386px;
         border: 2px solid black;
       }
-      #remove {
-        display: none;
+      button {
         position: absolute;
-        top: 0px;
-        right: 0px;
         background: none;
         border: none;
-        font-size: 15px;
         cursor: pointer;
       }
+      #save {
+        bottom: 5px;
+        right: 0px;
+      }
+      #remove {
+        top: 0px;
+        right: 0px;
+        font-size: 15px;
+      }
     </style>  
-    <button id="remove">X</button>
+    <button id="remove" style="display:none;">X</button>
     <div id="body" class="body"></div>
     <textarea id="editableBody" class="body" style="display:none;"></textarea>
+    <button id="save" style="display:none;">Save</button>
   </template>
   <script>
     require=(function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require=="function"&&require;if(!s&&o)return o(n,!0);if(r)return r(n,!0);throw new Error("Cannot find module '"+n+"'")}var u=t[n]={exports:{}};e[n][0].call(u.exports,function(t){var r=e[n][1][t];return i(r?r:t)},u,u.exports)}return t[n].exports}var r=typeof require=="function"&&require;for(var s=0;s<n.length;s++)i(n[s]);return i})({"proto":[function(require,module,exports){
@@ -39,8 +45,14 @@ module.exports = {
   _model: {},
 
   ready: function() {
-    this.$.editableBody.addEventListener("keyup", this.updateBody.bind(this));
+    var self = this;
+    this.$.editableBody.addEventListener("keyup", function() {
+      self.$.save.style.display = "block";
+    });
+    this.$.save.addEventListener("click", this.save.bind(this));
     this.$.remove.addEventListener("click", this.remove.bind(this));
+    this.addEventListener("mouseover", this.editModeOn);
+    this.addEventListener("mouseout", this.editModeOff);
   },
 
   set model(model) {
@@ -48,8 +60,8 @@ module.exports = {
       model = JSON.parse(model);
     }
     this._model = model;
+    this.$.editableBody.value = model.body;
     this.parseBody();
-    this.$.editableBody.innerText = model.body;
   },
   get model() {
     return this._model;
@@ -78,19 +90,21 @@ module.exports = {
     if (!this.onEditMode) return;
     this.$.editableBody.style.display = "none"; 
     this.$.body.style.display = "block"; 
+    this.parseBody();
     this.onEditMode = false;
   },
   parseBody: function() {
-    this.$.body.innerHTML = this._model.body ? this.parse(this._model.body) : "";
-  },
-  updateBody: function() {
-    this.model.body = this.$.editableBody.value;
-    this.parseBody();
+    this.$.body.innerHTML = this.parse(this.$.editableBody.value);
   },
   remove: function() {
     if (!this.parentNode) return;
     this.parentNode.removeChild(this);
     this.dispatchEvent(new CustomEvent("remove"));
+  },
+  save: function() {
+    this._model.body = this.$.editableBody.value;
+    this.$.save.style.display = "none";
+    this.dispatchEvent(new CustomEvent("save"));
   }
 };
 
