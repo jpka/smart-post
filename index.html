@@ -17,6 +17,7 @@
         border: 2px solid black;
       }
       #remove {
+        display: none;
         position: absolute;
         top: 0px;
         right: 0px;
@@ -52,6 +53,18 @@ module.exports = {
   },
   get model() {
     return this._model;
+  },
+
+  set editable(flag) {
+    if (flag) {
+      this.$.remove.style.display = "block";
+    } else {
+      this.$.remove.style.display = "none";
+    }
+    this._editable = flag;
+  },
+  get editable() {
+    return this._editable;
   },
 
   parse: require("marked"),

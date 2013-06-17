@@ -18,6 +18,18 @@ module.exports = {
     return this._model;
   },
 
+  set editable(flag) {
+    if (flag) {
+      this.$.remove.style.display = "block";
+    } else {
+      this.$.remove.style.display = "none";
+    }
+    this._editable = flag;
+  },
+  get editable() {
+    return this._editable;
+  },
+
   parse: require("marked"),
   editModeOn: function() {
     if (!this.editable) return;

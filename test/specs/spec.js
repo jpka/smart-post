@@ -71,16 +71,27 @@ describe("smart-post", function() {
     });
   });
 
-  it("has a remove button on it's corner that removes it from the DOM and triggers a remove event", function(done) {
-    var click = document.createEvent("MouseEvents");
-    click.initEvent("click", true, false);
-    document.body.appendChild(element);
+  describe("remove button", function() {
 
-    expect(element.$.remove).to.exist;
-    element.addEventListener("remove", function() {
-      expect(element.parentNode).to.not.exist;
-      done();
+    it("removes it from the DOM and triggers a remove event", function(done) {
+      element.editable = true;
+      var click = document.createEvent("MouseEvents");
+      click.initEvent("click", true, false);
+      document.body.appendChild(element);
+
+      expect(element.$.remove.style.display).to.not.equal("none");
+      element.addEventListener("remove", function() {
+        expect(element.parentNode).to.not.exist;
+        done();
+      });
+      element.$.remove.dispatchEvent(click);
     });
-    element.$.remove.dispatchEvent(click);
+
+    it("toggles with editable state", function() {
+      element.editable = false;
+      expect(element.$.remove.style.display).to.equal("none");
+      element.editable = true;
+      expect(element.$.remove.style.display).to.not.equal("none");
+    });
   });
 });
