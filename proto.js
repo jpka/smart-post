@@ -40,7 +40,8 @@ module.exports = {
   editModeOn: function() {
     if (!this.editable) return;
     this.$.editableBody.style.display = "block"; 
-    this.$.body.style.display = "none";
+    this.$.editableBody.style.height = (this.$.body.clientHeight - 10) + "px"; 
+    this.$.body.style.display = "none"; 
     this.onEditMode = true;
   },
   editModeOff: function() {

@@ -2,25 +2,31 @@
   <template>
     <style>
       @host {
-        * {
+        smart-post {
           position: relative;
           display: block;
           width: 600px;
-          height: 400px;
           margin: 10px;
+          border: 2px dashed black;
         }
       }
       .body {
         padding: 5px;
         width: 586px;
-        height: 386px;
-        border: 2px solid black;
+      }
+      #editableBody {
+        top: 0px;
+        left: 0px;
+        border: none;
       }
       button {
         position: absolute;
         background: none;
         border: none;
         cursor: pointer;
+      }
+      button:hover {
+        color: rgb(206, 26, 26);
       }
       #save {
         bottom: 5px;
@@ -83,7 +89,8 @@ module.exports = {
   editModeOn: function() {
     if (!this.editable) return;
     this.$.editableBody.style.display = "block"; 
-    this.$.body.style.display = "none";
+    this.$.editableBody.style.height = (this.$.body.clientHeight - 10) + "px"; 
+    this.$.body.style.display = "none"; 
     this.onEditMode = true;
   },
   editModeOff: function() {
