@@ -1,10 +1,14 @@
 describe("smart-post", function() {  
   var element,
-  model = {body: "#title\nsome text"};
+  body = "#title\nsome text";
 
-  beforeEach(function() {
+  beforeEach(function(done) {
     element = fixtures.window().document.createElement("smart-post");
-    element.model = model;
+    fixtures.window().document.body.appendChild(element);
+    element.addEventListener("update", function() {
+      done();
+    });
+    element.body = body;
   });
 
   it("contains a body", function() {
@@ -17,8 +21,8 @@ describe("smart-post", function() {
   });
 
   it("editable-body has the markdown source and body has the processed html", function() {
-    expect(element.$.editableBody.value).to.equal(model.body);
-    expect(element.$.body.innerHTML).to.equal(element.parse(model.body));
+    expect(element.$.editableBody.value).to.equal(body);
+    expect(element.$.body.innerHTML).to.equal(element.parse(body));
   });
 
   describe("save button", function() {
@@ -33,21 +37,16 @@ describe("smart-post", function() {
       expect(element.$.save.style.display).to.not.equal("none");
     });
 
-    it("saves to model when is pressed, and disappears", function() {
-      var newBody = "#new body",
-      click = fixtures.window().document.createEvent("MouseEvents");
+    it("fires save event when is pressed, and disappears", function(done) {
+      var click = fixtures.window().document.createEvent("MouseEvents");
       click.initEvent("click", true, false);
 
-      element.$.editableBody.value = newBody;
+      element.addEventListener("save", function() {
+        expect(element.$.save.style.display).to.equal("none");
+        done();
+      });
       element.$.save.dispatchEvent(click);
-      expect(element.model.body).to.equal(newBody);
-      expect(element.$.save.style.display).to.equal("none");
     });
-  });
-
-  it("can be instantiated with model as a JSON string attribute", function() {
-    element = fixtures.window().document.querySelector("#post");
-    expect(element.model).to.exist.and.to.deep.equal(model);
   });
 
   describe("on hover", function() {
@@ -112,5 +111,13 @@ describe("smart-post", function() {
       element.editable = true;
       expect(element.$.remove.style.display).to.not.equal("none");
     });
+  });
+
+  it("updates when body changes", function(done) {
+    element.body = "changed";
+    setTimeout(function() {
+      expect(element.$.body.innerHTML).to.include("changed");
+      done();
+    }, 1000);
   });
 });

@@ -1,6 +1,4 @@
 module.exports = {
-  _model: {},
-
   ready: function() {
     var self = this;
     this.$.editableBody.addEventListener("keyup", function() {
@@ -10,18 +8,7 @@ module.exports = {
     this.$.remove.addEventListener("click", this.remove.bind(this));
     this.addEventListener("mouseover", this.editModeOn);
     this.addEventListener("mouseout", this.editModeOff);
-  },
-
-  set model(model) {
-    if (typeof model === "string") {
-      model = JSON.parse(model);
-    }
-    this._model = model;
-    this.$.editableBody.value = model.body;
     this.parseBody();
-  },
-  get model() {
-    return this._model;
   },
 
   set editable(flag) {
@@ -51,8 +38,14 @@ module.exports = {
     this.parseBody();
     this.onEditMode = false;
   },
+  bodyChanged: function() {
+    if (!this.onEditMode) {
+      this.parseBody();
+    }
+  },
   parseBody: function() {
     this.$.body.innerHTML = this.parse(this.$.editableBody.value);
+    this.dispatchEvent(new CustomEvent("update"));
   },
   remove: function() {
     if (!this.parentNode) return;
@@ -60,7 +53,6 @@ module.exports = {
     this.dispatchEvent(new CustomEvent("remove"));
   },
   save: function() {
-    this._model.body = this.$.editableBody.value;
     this.$.save.style.display = "none";
     this.dispatchEvent(new CustomEvent("save"));
   }

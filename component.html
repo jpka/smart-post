@@ -1,4 +1,4 @@
-<element name="smart-post" attributes="model editable">
+<element name="smart-post" attributes="body editable">
   <template>
     <style>
       @host {
@@ -40,7 +40,7 @@
     </style>  
     <button id="remove" style="display:none;">X</button>
     <div id="body" class="body"></div>
-    <textarea id="editableBody" class="body" style="display:none;"></textarea>
+    <textarea id="editableBody" class="body" style="display:none;" value="{{ body }}"></textarea>
     <button id="save" style="display:none;">Save</button>
   </template>
   <script>

@@ -6,7 +6,13 @@
     <link rel="import" href="/base/index.html"/>
   </head>
   <body>
-    <smart-post id="post" model="{'body': '#title\nsome text'}"></smart-post>
+    <smart-post id="post"></smart-post>
+    <script>
+      window.addEventListener("WebComponentsReady", function() {
+        document.querySelector("#post").editable = true;
+        document.querySelector("#post").body = "#title\nsome text";
+      });
+    </script>
   </body>
 </html>
 
