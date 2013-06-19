@@ -91,14 +91,14 @@ describe("smart-post", function() {
 
   describe("remove button", function() {
 
-    it("removes it from the DOM and triggers a remove event", function(done) {
+    it("removes it from the DOM and triggers a delete event", function(done) {
       var click = fixtures.window().document.createEvent("MouseEvents");
       click.initEvent("click", true, false);
       element.editable = true;
       fixtures.window().document.body.appendChild(element);
 
       expect(element.$.remove.style.display).to.not.equal("none");
-      element.addEventListener("remove", function() {
+      element.addEventListener("delete", function() {
         expect(element.parentNode).to.not.exist;
         done();
       });

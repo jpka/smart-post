@@ -127,7 +127,7 @@ module.exports = {
   remove: function() {
     if (!this.parentNode) return;
     this.parentNode.removeChild(this);
-    this.fire("remove");
+    this.fire("delete");
   },
   save: function() {
     this.$.save.style.display = "none";
