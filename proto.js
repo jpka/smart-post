@@ -1,4 +1,9 @@
 module.exports = {
+  ready: function() {
+    this._ready = true;
+    this.parseBody();
+  },
+
   set editable(flag) {
     if (flag) {
       this.$.remove.style.display = "block";
@@ -11,22 +16,33 @@ module.exports = {
     return this._editable;
   },
 
-  _model: {
-    body: ""
-  },
   set model(model) {
     if (typeof model === "string") {
       model = JSON.parse(model);
     }
-    //Just to kickstart it, he's a little shy...
-    this.$.editableBody.value = model.body;
     this._model = model;
-    this.parseBody();
+    this.observeModel();
   },
   get model() {
+    if (!this._model) {
+      this.model = {
+        body: ""
+      };
+    }
     return this._model;
   },
 
+  observeModel: function() {
+    var key;
+
+    for (key in this.model) {
+      new PathObserver(this.model, key, function(inNew, inOld) {
+        if (inNew === inOld) return;
+        this[key + "Changed"](inOld);
+      }.bind(this));
+      this[key + "Changed"]();
+    }
+  },
   showSaveButton: function() {
     this.$.save.style.display = "block";
   },
@@ -45,22 +61,27 @@ module.exports = {
     this.parseBody();
     this.onEditMode = false;
   },
-  modelChanged: function() {
+  bodyChanged: function() {
     if (!this.onEditMode) {
       this.parseBody();
     }
   },
   parseBody: function() {
+    if (!this._ready) return;
+    //Just to kickstart it, he's a little shy...
+    if (!this.$.editableBody.value) {
+      this.$.editableBody.value = this.model.body;
+    }
     this.$.body.innerHTML = this.parse(this.$.editableBody.value);
-    this.send("update");
+    this.fire("update");
   },
   remove: function() {
     if (!this.parentNode) return;
     this.parentNode.removeChild(this);
-    this.send("remove");
+    this.fire("remove");
   },
   save: function() {
     this.$.save.style.display = "none";
-    this.send("save");
+    this.fire("save");
   }
 };
