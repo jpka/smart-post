@@ -1,6 +1,6 @@
 describe("smart-post", function() {  
   var element,
-  body = "#title\nsome text";
+  model = {body: "#title\nsome text"};
 
   beforeEach(function(done) {
     element = fixtures.window().document.createElement("smart-post");
@@ -8,7 +8,7 @@ describe("smart-post", function() {
     element.addEventListener("update", function() {
       done();
     });
-    element.body = body;
+    element.model = model;
   });
 
   it("contains a body", function() {
@@ -21,8 +21,8 @@ describe("smart-post", function() {
   });
 
   it("editable-body has the markdown source and body has the processed html", function() {
-    expect(element.$.editableBody.value).to.equal(body);
-    expect(element.$.body.innerHTML).to.equal(element.parse(body));
+    expect(element.$.editableBody.value).to.equal(model.body);
+    expect(element.$.body.innerHTML).to.equal(element.parse(model.body));
   });
 
   describe("save button", function() {
@@ -114,7 +114,7 @@ describe("smart-post", function() {
   });
 
   it("updates when body changes", function(done) {
-    element.body = "changed";
+    element.model.body = "changed";
     setTimeout(function() {
       expect(element.$.body.innerHTML).to.include("changed");
       done();

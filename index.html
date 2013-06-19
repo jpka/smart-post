@@ -1,4 +1,4 @@
-<element name="smart-post" attributes="body editable">
+<element name="smart-post" attributes="model editable" on-mouseover="editModeOn" on-mouseout="editModeOff">
   <template>
     <style>
       @host {
@@ -38,28 +38,16 @@
         font-size: 15px;
       }
     </style>  
-    <button id="remove" style="display:none;">X</button>
+    <button id="remove" style="display:none;" on-click="remove">X</button>
     <div id="body" class="body"></div>
-    <textarea id="editableBody" class="body" style="display:none;" value="{{ body }}"></textarea>
-    <button id="save" style="display:none;">Save</button>
+    <textarea id="editableBody" class="body" style="display:none;" value="{{model.body}}" on-keyup="showSaveButton"></textarea>
+    <button id="save" style="display:none;" on-click="save">Save</button>
   </template>
   <script>
     require=(function(e,t,n){function i(n,s){if(!t[n]){if(!e[n]){var o=typeof require=="function"&&require;if(!s&&o)return o(n,!0);if(r)return r(n,!0);throw new Error("Cannot find module '"+n+"'")}var u=t[n]={exports:{}};e[n][0].call(u.exports,function(t){var r=e[n][1][t];return i(r?r:t)},u,u.exports)}return t[n].exports}var r=typeof require=="function"&&require;for(var s=0;s<n.length;s++)i(n[s]);return i})({"proto":[function(require,module,exports){
 module.exports=require('o1PFch');
 },{}],"o1PFch":[function(require,module,exports){
 module.exports = {
-  ready: function() {
-    var self = this;
-    this.$.editableBody.addEventListener("keyup", function() {
-      self.$.save.style.display = "block";
-    });
-    this.$.save.addEventListener("click", this.save.bind(this));
-    this.$.remove.addEventListener("click", this.remove.bind(this));
-    this.addEventListener("mouseover", this.editModeOn);
-    this.addEventListener("mouseout", this.editModeOff);
-    this.parseBody();
-  },
-
   set editable(flag) {
     if (flag) {
       this.$.remove.style.display = "block";
@@ -72,6 +60,25 @@ module.exports = {
     return this._editable;
   },
 
+  _model: {
+    body: ""
+  },
+  set model(model) {
+    if (typeof model === "string") {
+      model = JSON.parse(model);
+    }
+    //Just to kickstart it, he's a little shy...
+    this.$.editableBody.value = model.body;
+    this._model = model;
+    this.parseBody();
+  },
+  get model() {
+    return this._model;
+  },
+
+  showSaveButton: function() {
+    this.$.save.style.display = "block";
+  },
   parse: require("marked"),
   editModeOn: function() {
     if (!this.editable) return;
@@ -87,23 +94,23 @@ module.exports = {
     this.parseBody();
     this.onEditMode = false;
   },
-  bodyChanged: function() {
+  modelChanged: function() {
     if (!this.onEditMode) {
       this.parseBody();
     }
   },
   parseBody: function() {
     this.$.body.innerHTML = this.parse(this.$.editableBody.value);
-    this.dispatchEvent(new CustomEvent("update"));
+    this.send("update");
   },
   remove: function() {
     if (!this.parentNode) return;
     this.parentNode.removeChild(this);
-    this.dispatchEvent(new CustomEvent("remove"));
+    this.send("remove");
   },
   save: function() {
     this.$.save.style.display = "none";
-    this.dispatchEvent(new CustomEvent("save"));
+    this.send("save");
   }
 };
 
