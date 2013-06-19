@@ -105,11 +105,22 @@ describe("smart-post", function() {
       element.$.remove.dispatchEvent(click);
     });
 
-    it("toggles with editable state", function() {
+    it("toggles with editable and fixed state", function() {
       element.editable = false;
+      element.fixed = false;
       expect(element.$.remove.style.display).to.equal("none");
+
+      element.editable = false;
+      element.fixed = true;
+      expect(element.$.remove.style.display).to.equal("none");
+
       element.editable = true;
+      element.fixed = false;
       expect(element.$.remove.style.display).to.not.equal("none");
+
+      element.editable = true;
+      element.fixed = true;
+      expect(element.$.remove.style.display).to.equal("none");
     });
   });
 

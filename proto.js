@@ -5,15 +5,19 @@ module.exports = {
   },
 
   set editable(flag) {
-    if (flag) {
-      this.$.remove.style.display = "block";
-    } else {
-      this.$.remove.style.display = "none";
-    }
     this._editable = flag;
+    this.updateRemoveButton();
   },
   get editable() {
-    return this._editable;
+    return this._editable || null;
+  },
+
+  set fixed(flag) {
+    this._fixed = flag;
+    this.updateRemoveButton();
+  },
+  get fixed() {
+    return this._fixed || null;
   },
 
   set model(model) {
@@ -32,6 +36,9 @@ module.exports = {
     return this._model;
   },
 
+  updateRemoveButton: function() {
+    this.$.remove.style.display = this.editable && !this.fixed ? "block" : "none";
+  },
   observeModel: function() {
     var key;
 
