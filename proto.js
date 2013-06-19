@@ -40,18 +40,16 @@ module.exports = {
     this.$.remove.style.display = this.editable && !this.fixed ? "block" : "none";
   },
   observeModel: function() {
-    var key;
+    var key, observer;
 
     for (key in this.model) {
-      new PathObserver(this.model, key, function(inNew, inOld) {
+      observer = new PathObserver(this.model, key, function(inNew, inOld) {
         if (inNew === inOld) return;
         this[key + "Changed"](inOld);
       }.bind(this));
+      Polymer.registerObserver(this, "property", key, observer);
       this[key + "Changed"]();
     }
-  },
-  showSaveButton: function() {
-    this.$.save.style.display = "block";
   },
   parse: require("marked"),
   editModeOn: function() {
@@ -69,9 +67,11 @@ module.exports = {
     this.onEditMode = false;
   },
   bodyChanged: function() {
+    if (!this._ready) return;
     if (!this.onEditMode) {
       this.parseBody();
     }
+    this.$.save.style.display = this.model.body && this.model.body !== "" ? "block" : "none";
   },
   parseBody: function() {
     if (!this._ready) return;

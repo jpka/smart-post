@@ -6,18 +6,20 @@
           position: relative;
           display: block;
           width: 600px;
-          margin: 10px;
+          margin: 20px;
           border: 2px dashed black;
         }
       }
       .body {
         padding: 5px;
         width: 586px;
+        min-height: 3.5em;
       }
       #editableBody {
         top: 0px;
         left: 0px;
         border: none;
+        height: 3.5em;
       }
       button {
         position: absolute;
@@ -40,7 +42,7 @@
     </style>  
     <button id="remove" style="display:none;" on-click="remove">X</button>
     <div id="body" class="body"></div>
-    <textarea id="editableBody" class="body" style="display:none;" value="{{model.body}}" on-keyup="showSaveButton"></textarea>
+    <textarea id="editableBody" class="body" style="display:none;" value="{{model.body}}"></textarea>
     <button id="save" style="display:none;" on-click="save">Save</button>
   </template>
   <script>
@@ -89,18 +91,16 @@ module.exports = {
     this.$.remove.style.display = this.editable && !this.fixed ? "block" : "none";
   },
   observeModel: function() {
-    var key;
+    var key, observer;
 
     for (key in this.model) {
-      new PathObserver(this.model, key, function(inNew, inOld) {
+      observer = new PathObserver(this.model, key, function(inNew, inOld) {
         if (inNew === inOld) return;
         this[key + "Changed"](inOld);
       }.bind(this));
+      Polymer.registerObserver(this, "property", key, observer);
       this[key + "Changed"]();
     }
-  },
-  showSaveButton: function() {
-    this.$.save.style.display = "block";
   },
   parse: require("marked"),
   editModeOn: function() {
@@ -118,9 +118,11 @@ module.exports = {
     this.onEditMode = false;
   },
   bodyChanged: function() {
+    if (!this._ready) return;
     if (!this.onEditMode) {
       this.parseBody();
     }
+    this.$.save.style.display = this.model.body && this.model.body !== "" ? "block" : "none";
   },
   parseBody: function() {
     if (!this._ready) return;

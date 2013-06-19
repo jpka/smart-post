@@ -26,20 +26,32 @@ describe("smart-post", function() {
   });
 
   describe("save button", function() {
+    beforeEach(function() {
+      element = fixtures.window().document.createElement("smart-post");
+      fixtures.window().document.body.appendChild(element);
+      element.editable = true;
+    });
+
     it("isn't visible at first", function() {
       expect(element.$.save.style.display).to.equal("none");
     });
 
-    it("appears when keyup happens in textarea", function() {
-      var keyUp = fixtures.window().document.createEvent("KeyboardEvent");
-      keyUp.initEvent("keyup", true, false);
-      element.$.editableBody.dispatchEvent(keyUp);
-      expect(element.$.save.style.display).to.not.equal("none");
+    it("toggles on body change, depending if there is or isn't text", function(done) {
+      element.model.body = "algo";
+      setTimeout(function() {
+        expect(element.$.save.style.display).to.not.equal("none");
+        element.model.body = "";
+        setTimeout(function() {
+          expect(element.$.save.style.display).to.equal("none");
+          done();
+        }, 900);
+      }, 900);
     });
 
     it("fires save event when is pressed, and disappears", function(done) {
       var click = fixtures.window().document.createEvent("MouseEvents");
       click.initEvent("click", true, false);
+      element.$.save.style.display = "block";
 
       element.addEventListener("save", function() {
         expect(element.$.save.style.display).to.equal("none");
