@@ -117,12 +117,12 @@ module.exports = {
     this.parseBody();
     this.onEditMode = false;
   },
-  bodyChanged: function() {
+  bodyChanged: function(old) {
     if (!this._ready) return;
+    this.$.save.style.display = old && this.model.body && this.model.body !== "" ? "block" : "none";
     if (!this.onEditMode) {
       this.parseBody();
     }
-    this.$.save.style.display = this.model.body && this.model.body !== "" ? "block" : "none";
   },
   parseBody: function() {
     if (!this._ready) return;

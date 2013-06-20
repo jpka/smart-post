@@ -38,14 +38,17 @@ describe("smart-post", function() {
 
     it("toggles on body change, depending if there is or isn't text", function(done) {
       element.model.body = "algo";
-      setTimeout(function() {
-        expect(element.$.save.style.display).to.not.equal("none");
-        element.model.body = "";
-        setTimeout(function() {
-          expect(element.$.save.style.display).to.equal("none");
-          done();
-        }, 900);
-      }, 900);
+      element.addEventListener("update", function() {
+        element.model.body = "algo2";
+        element.addEventListener("update", function() {
+          expect(element.$.save.style.display).to.not.equal("none");
+          element.model.body = "";
+          element.addEventListener("update", function() {
+            expect(element.$.save.style.display).to.equal("none");
+            done();
+          });
+        });
+      });
     });
 
     it("fires save event when is pressed, and disappears", function(done) {
