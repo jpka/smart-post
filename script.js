@@ -1,31 +1,15 @@
 Polymer.register(this, {
+  fixed: false,
+  editable: false,
+
   ready: function() {
     var self = this;
     this._ready = true;
-    this.$.title.innerHTML = this.model.title;
+    this.$.title.textContent = this.model.title;
     this.parseBody();
   },
 
-  set editable(flag) {
-    this._editable = flag;
-    this.updateRemoveButton();
-  },
-  get editable() {
-    return this._editable || null;
-  },
-
-  set fixed(flag) {
-    this._fixed = flag;
-    this.updateRemoveButton();
-  },
-  get fixed() {
-    return this._fixed || null;
-  },
-
   set model(model) {
-    if (typeof model === "string") {
-      model = JSON.parse(model);
-    }
     this._model = model;
     this.observeModel();
   },
@@ -39,9 +23,6 @@ Polymer.register(this, {
     return this._model;
   },
 
-  updateRemoveButton: function() {
-    this.$.remove.style.display = this.editable && !this.fixed ? "block" : "none";
-  },
   observeModel: function() {
     var self = this;
 
@@ -61,37 +42,36 @@ Polymer.register(this, {
   parse: require("marked"),
   editModeOn: function() {
     if (!this.editable) return;
-    this.$.editableBody.style.display = "block"; 
     this.$.editableBody.style.height = (this.$.body.clientHeight) + "px"; 
-    this.$.body.style.display = "none"; 
     this.onEditMode = true;
   },
   editModeOff: function() {
     if (!this.onEditMode) return;
-    this.$.editableBody.style.display = "none"; 
-    this.$.body.style.display = "block";
     this.parseBody();
     this.onEditMode = false;
   },
   updateTitle: function() {
-    this.model.title = this.$.title.innerHTML;
+    while (this.$.title.firstElementChild) {
+      this.$.title.removeChild(this.$.title.firstElementChild);
+    }
+    this.model.title = this.$.title.textContent;
   },
   titleChanged: function(old) {
     if (!this._ready) return;
-    this.$.save.style.display = old && this.model.title && this.model.title !== "" ? "block" : "none";
+    this.$.save.hidden = !old || !this.model.title || this.model.title === "";
     if (!this.onEditMode) {
       this.$.title.style.opacity = 0;
     }
   },
   titleTransitionEnded: function() {
     if (this.$.title.style.opacity > 0) return;
-    this.$.title.innerHTML = this.model.title;
+    this.$.title.textContent = this.model.title;
     this.dispatchEvent(new CustomEvent("foreign:update:title"));
     this.$.title.style.opacity = 1;
   },
   bodyChanged: function(old) {
     if (!this._ready) return;
-    this.$.save.style.display = old && this.model.body && this.model.body !== "" ? "block" : "none";
+    this.$.save.hidden = !old || !this.model.body || this.model.body === "";
     if (!this.onEditMode) {
       this.$.body.style.opacity = 0;
     }
@@ -117,7 +97,7 @@ Polymer.register(this, {
     this.fire("delete");
   },
   save: function() {
-    this.$.save.style.display = "none";
+    this.$.save.hidden = true;
     this.fire("save");
   },
   keyUp: function(e) {
