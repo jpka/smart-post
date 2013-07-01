@@ -2,12 +2,18 @@
 
 <html>
   <head>
-    <script src="/base/node_modules/Polymer/polymer.min.js"></script>
+    <script src="/base/components/polymer/polymer.min.js"></script>
+    <script src="/base/test/script.js"></script>
     <link rel="import" href="/base/index.html"/>
+    <style>
+      smart-post {
+        border: 1px solid black;
+      }
+    </style>
   </head>
   <body>
-    <smart-post id="post" editable="true" model="{'body': '#title\nHolis'}"></smart-post>
-    <smart-post id="empty" editable="true"></smart-post>
+    <smart-post id="post" class="post" editable="true" model="{'title': 'title', 'body': 'Holis'}"></smart-post>
+    <smart-post id="empty" class="post" editable="true"></smart-post>
   </body>
 </html>
 

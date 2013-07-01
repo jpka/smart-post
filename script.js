@@ -1,6 +1,8 @@
-module.exports = {
+Polymer.register(this, {
   ready: function() {
+    var self = this;
     this._ready = true;
+    this.$.title.innerHTML = this.model.title;
     this.parseBody();
   },
 
@@ -30,6 +32,7 @@ module.exports = {
   get model() {
     if (!this._model) {
       this.model = {
+        title: "",
         body: ""
       };
     }
@@ -40,38 +43,64 @@ module.exports = {
     this.$.remove.style.display = this.editable && !this.fixed ? "block" : "none";
   },
   observeModel: function() {
-    var key, observer;
+    var self = this;
 
-    for (key in this.model) {
-      observer = new PathObserver(this.model, key, function(inNew, inOld) {
+    Object.keys(this._model).forEach(function(key) {
+      var fname = key + "Changed",
+      observer;
+
+      observer = new PathObserver(self._model, key, function(inNew, inOld) {
         if (inNew === inOld) return;
-        this[key + "Changed"](inOld);
-      }.bind(this));
-      Polymer.registerObserver(this, "property", key, observer);
-      this[key + "Changed"]();
-    }
+        console.log(key);
+        if (typeof self[fname] === "function") self[fname](inOld);
+      });
+      Polymer.registerObserver(self, "property", key, observer);
+      if (self[fname]) self[fname]();
+    });
   },
   parse: require("marked"),
   editModeOn: function() {
     if (!this.editable) return;
     this.$.editableBody.style.display = "block"; 
-    this.$.editableBody.style.height = (this.$.body.clientHeight - 10) + "px"; 
+    this.$.editableBody.style.height = (this.$.body.clientHeight) + "px"; 
     this.$.body.style.display = "none"; 
     this.onEditMode = true;
   },
   editModeOff: function() {
     if (!this.onEditMode) return;
     this.$.editableBody.style.display = "none"; 
-    this.$.body.style.display = "block"; 
+    this.$.body.style.display = "block";
     this.parseBody();
     this.onEditMode = false;
+  },
+  updateTitle: function() {
+    this.model.title = this.$.title.innerHTML;
+  },
+  titleChanged: function(old) {
+    if (!this._ready) return;
+    this.$.save.style.display = old && this.model.title && this.model.title !== "" ? "block" : "none";
+    if (!this.onEditMode) {
+      this.$.title.style.opacity = 0;
+    }
+  },
+  titleTransitionEnded: function() {
+    if (this.$.title.style.opacity > 0) return;
+    this.$.title.innerHTML = this.model.title;
+    this.dispatchEvent(new CustomEvent("foreign:update:title"));
+    this.$.title.style.opacity = 1;
   },
   bodyChanged: function(old) {
     if (!this._ready) return;
     this.$.save.style.display = old && this.model.body && this.model.body !== "" ? "block" : "none";
     if (!this.onEditMode) {
-      this.parseBody();
+      this.$.body.style.opacity = 0;
     }
+  },
+  bodyTransitionEnded: function() {
+    if (this.$.body.style.opacity > 0) return;
+    this.parseBody();
+    this.dispatchEvent(new CustomEvent("foreign:update:body"));
+    this.$.body.style.opacity = 1;
   },
   parseBody: function() {
     if (!this._ready) return;
@@ -90,5 +119,18 @@ module.exports = {
   save: function() {
     this.$.save.style.display = "none";
     this.fire("save");
+  },
+  keyUp: function(e) {
+    switch (e.keyCode) {
+      case 13: //ENTER
+        this.save();
+      case 27: //ESC
+        this.editModeOff();
+    }
+  },
+  preventNewLine: function(e) {
+    if (e.keyCode === 13) {
+      e.preventDefault();
+    }
   }
-};
+});

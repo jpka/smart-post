@@ -8,5 +8,9 @@
     "components"
   ],
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "polymer": "*",
+    "marked": "~0.2.9",
+    "chai": "~1.7.2"
+  }
 }

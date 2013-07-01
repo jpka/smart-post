@@ -1,6 +1,6 @@
 {
   "name": "smart-post",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "",
   "directories": {
     "test": "test"
@@ -11,12 +11,11 @@
   "devDependencies": {
     "karma": "~0.8.5",
     "js-fixtures": "~1.2.0",
-    "Polymer": "git://github.com/Polymer/polymer.git",
-    "chai": "~1.6.0",
     "grunt": "~0.4.1",
-    "grunt-replace": "~0.4.4",
     "grunt-contrib-watch": "~0.4.4",
-    "browserify": "~2.18.1"
+    "inliner": "~0.1.14",
+    "grunt-replace": "~0.4.4",
+    "browserify": "~2.22.0"
   },
   "scripts": {
     "test": "node_modules/.bin/karma start"
