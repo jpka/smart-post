@@ -1,4 +1,4 @@
-<element name="smart-post" attributes="model editable fixed" on-mouseover="editModeOn" on-mouseout="editModeOff">
+<element name="smart-post" attributes="model editable fixed onEditMode" on-dblclick="editModeOn" on-keyup="keyUp">
   <template>
     <style>
       @host {
@@ -7,22 +7,30 @@
           display: block;
           width: 600px;
           margin: 20px;
-          border: 2px dashed black;
+          padding: 5px;
         }
       }
+      #bodyContainer {
+        width: 595px;
+      }
       .body {
-        padding: 5px;
-        width: 586px;
-        min-height: 3.5em;
+        min-height: 2em;
+        width: 100%;
+        height: 100%;
+      }
+      #title {
+        margin-top: 0px;
+        min-height: 1em;
       }
       #editableBody {
-        top: 0px;
-        left: 0px;
         border: none;
         height: 3.5em;
+        bottom: 10px;
+        margin: 0px;
+        padding: 0px;
       }
       button {
-        position: absolute;
+        float: right;
         background: none;
         border: none;
         cursor: pointer;
@@ -30,24 +38,29 @@
       button:hover {
         color: rgb(206, 26, 26);
       }
-      #save {
-        bottom: 5px;
-        right: 0px;
-      }
       #remove {
         top: 0px;
         right: 0px;
         font-size: 15px;
       }
-    </style>  
+      .clear {
+        clear: both;
+      }
+      .updeatable {
+        transition: opacity 1s;
+      }
+    </style>
     <button id="remove" style="display:none;" on-click="remove">X</button>
-    <div id="body" class="body"></div>
-    <textarea id="editableBody" class="body" style="display:none;" value="{{model.body}}"></textarea>
+    <div class="clear"></div>
+    <h1 id="title" class="updeatable" contentEditable="{{onEditMode}}" on-keyup="updateTitle" on-keydown="preventNewLine" on-focusout="editModeOff" on-transitionend="titleTransitionEnded"></h1>
+    <div id="bodyContainer">
+      <div id="body" class="body updeatable" on-transitionend="bodyTransitionEnded"></div>
+      <textarea id="editableBody" class="body" style="display:none;" value="{{model.body}}" on-focusout="editModeOff"></textarea>
+    </div>
     <button id="save" style="display:none;" on-click="save">Save</button>
+    <div class="clear"></div>
   </template>
   <script>
     @@script
-
-    Polymer.register(this, require("proto"));
   </script>
 </element>

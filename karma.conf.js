@@ -10,12 +10,13 @@ basePath = '';
 files = [
   MOCHA,
   MOCHA_ADAPTER,
-  'node_modules/Polymer/polymer.min.js',
-  'node_modules/chai/chai.js',
+  'components/chai/chai.js',
+  'node_modules/js-fixtures/fixtures.js',
+  {pattern: 'components/**/*', watched: true, served: true, included: false},
+  {pattern: 'node_modules/**/*', watched: true, served: true, included: false},
   {pattern: 'index.html', watched: true, served: true, included: false},
   {pattern: 'test/index.html', watched: true, served: true, included: false},
-  'node_modules/js-fixtures/fixtures.js',
-  'components/jquery/jquery.js',
+  {pattern: 'test/**/*', watched: true, served: true, included: false},
   'test/setup.js',
   'test/specs/**/*.js'
 ];

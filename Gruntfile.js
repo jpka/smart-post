@@ -1,10 +1,12 @@
+var cp = require("child_process");
+
 module.exports = function(grunt) {
   grunt.initConfig({
     replace: {
       build: {
         options: {
           variables: {
-            "script": "<%= grunt.file.read('browserified.js') %>"
+            "script": "<%= grunt.file.read('script.js') %>"
           }
         },
         files: [
@@ -14,31 +16,26 @@ module.exports = function(grunt) {
     },
     watch: {
       build: {
-        files: ["proto.js", "component.html"],
+        files: ["script.js", "component.html"],
         tasks: ["build"]
       }
     }
   });
-  grunt.loadNpmTasks("grunt-replace");
   grunt.loadNpmTasks("grunt-contrib-watch");
+  grunt.loadNpmTasks("grunt-replace");
 
   grunt.registerTask("karma", function() {
-    require("child_process").spawn("node_modules/.bin/karma", ["start"], {stdio: "inherit"});
+    cp.spawn("node_modules/.bin/karma", ["start"], {stdio: "inherit"});
   });
 
   grunt.registerTask("browserify", function() {
-    var done = this.async(),
-    b = require("browserify")();
-    b.require("./proto.js", {expose: "proto"});
-    var opts = {};
-
-    b.bundle(opts, function(err, js) {
-      if (err) throw err;
-      require("fs").writeFileSync("browserified.js", js);
-      done();
-    });
+    cp.exec("node_modules/.bin/browserify -r ./components/marked/index.js:marked > test/script.js", this.async());
   });
 
-  grunt.registerTask("build", ["browserify", "replace:build"]);
-  grunt.registerTask("test", ["build", "karma", "watch:build"]);
+  grunt.registerTask("inline", function() {
+    cp.exec("node_modules/.bin/inliner component.html > index.html", this.async());
+  });
+
+  grunt.registerTask("build", ["replace"]);
+  grunt.registerTask("test", ["build", "browserify", "karma", "watch:build"]);
 }

@@ -1,6 +1,6 @@
 describe("smart-post", function() {  
   var element,
-  model = {body: "#title\nsome text"};
+  model = {title: "Title", body: "some text"};
 
   beforeEach(function(done) {
     element = fixtures.window().document.createElement("smart-post");
@@ -9,15 +9,6 @@ describe("smart-post", function() {
       done();
     });
     element.model = model;
-  });
-
-  it("contains a body", function() {
-    expect(element.$.body).to.exist;
-  });
-
-  it("contains a hidden editable body", function() {
-    expect(element.$.editableBody).to.exist;
-    expect(element.$.editableBody.style.display).to.equal("none");
   });
 
   it("editable-body has the markdown source and body has the processed html", function() {

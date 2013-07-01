@@ -1,0 +1,16 @@
+{
+  "name": "smart-post",
+  "version": "0.0.0",
+  "main": "index.html",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "polymer": "*",
+    "marked": "~0.2.9",
+    "chai": "~1.7.2"
+  }
+}
