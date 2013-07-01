@@ -32,7 +32,6 @@ Polymer.register(this, {
 
       observer = new PathObserver(self._model, key, function(inNew, inOld) {
         if (inNew === inOld) return;
-        console.log(key);
         if (typeof self[fname] === "function") self[fname](inOld);
       });
       Polymer.registerObserver(self, "property", key, observer);
@@ -50,22 +49,28 @@ Polymer.register(this, {
     this.parseBody();
     this.onEditMode = false;
   },
-  updateTitle: function() {
+  updateTitleModel: function() {
     while (this.$.title.firstElementChild) {
       this.$.title.removeChild(this.$.title.firstElementChild);
     }
     this.model.title = this.$.title.textContent;
   },
+  updateTitle: function() {
+    this.$.title.textContent = this.model.title;
+  },
   titleChanged: function(old) {
     if (!this._ready) return;
     this.$.save.hidden = !old || !this.model.title || this.model.title === "";
     if (!this.onEditMode) {
-      this.$.title.style.opacity = 0;
+      if (this.style.display === "none") {
+        this.dispatchEvent(new CustomEvent("foreign:update:title"));
+      } else {
+        this.$.title.style.opacity = 0;
+      }
     }
   },
   titleTransitionEnded: function() {
     if (this.$.title.style.opacity > 0) return;
-    this.$.title.textContent = this.model.title;
     this.dispatchEvent(new CustomEvent("foreign:update:title"));
     this.$.title.style.opacity = 1;
   },
@@ -73,12 +78,15 @@ Polymer.register(this, {
     if (!this._ready) return;
     this.$.save.hidden = !old || !this.model.body || this.model.body === "";
     if (!this.onEditMode) {
-      this.$.body.style.opacity = 0;
+      if (this.style.display === "none") {
+        this.dispatchEvent(new CustomEvent("foreign:update:body"));
+      } else {
+        this.$.body.style.opacity = 0;
+      }
     }
   },
   bodyTransitionEnded: function() {
     if (this.$.body.style.opacity > 0) return;
-    this.parseBody();
     this.dispatchEvent(new CustomEvent("foreign:update:body"));
     this.$.body.style.opacity = 1;
   },

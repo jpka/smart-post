@@ -1,4 +1,4 @@
-<element name="smart-post" attributes="model editable fixed onEditMode" on-dblclick="editModeOn" on-keyup="keyUp">
+<element name="smart-post" attributes="model editable fixed onEditMode" on-dblclick="editModeOn" on-keyup="keyUp" on-foreign:update:body="parseBody" on-foreign:update:title="updateTitle">
   <template>
     <style>
       @host {
@@ -52,7 +52,7 @@
     </style>
     <button id="remove" on-click="remove" hidden?="{{!editable || fixed}}">X</button>
     <div class="clear"></div>
-    <h1 id="title" class="updeatable" contentEditable="{{onEditMode}}" on-keyup="updateTitle" on-keydown="preventNewLine" on-focusout="editModeOff" on-transitionend="titleTransitionEnded"></h1>
+    <h1 id="title" class="updeatable" contentEditable="{{onEditMode}}" on-keyup="updateTitleModel" on-keydown="preventNewLine" on-focusout="editModeOff" on-transitionend="titleTransitionEnded"></h1>
     <div id="bodyContainer">
       <div id="body" class="body updeatable" on-transitionend="bodyTransitionEnded" hidden?="{{onEditMode}}"></div>
       <textarea id="editableBody" class="body" value="{{model.body}}" on-focusout="editModeOff" hidden?="{{!onEditMode}}"></textarea>

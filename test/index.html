@@ -14,6 +14,13 @@
   <body>
     <smart-post id="post" class="post" editable="true" model="{'title': 'title', 'body': 'Holis'}"></smart-post>
     <smart-post id="empty" class="post" editable="true"></smart-post>
+    <smart-post id="hidden" style="display:none;" class="post" editable="true"></smart-post>
+    <script>
+      setTimeout(function() {
+        document.querySelector("#hidden").model = {'title': 'title', 'body': 'Holis'};
+        document.querySelector("#hidden").style.display = "block";
+      }, 2000);
+    </script>
   </body>
 </html>
 
