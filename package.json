@@ -13,9 +13,9 @@
     "js-fixtures": "~1.2.0",
     "grunt": "~0.4.1",
     "grunt-contrib-watch": "~0.4.4",
-    "inliner": "~0.1.14",
     "grunt-replace": "~0.4.4",
-    "browserify": "~2.22.0"
+    "browserify": "~2.22.0",
+    "uglify-js": "~2.3.6"
   },
   "scripts": {
     "test": "node_modules/.bin/karma start"

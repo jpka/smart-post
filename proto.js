@@ -1,4 +1,4 @@
-Polymer.register(this, {
+module.exports = {
   fixed: false,
   editable: false,
 
@@ -38,7 +38,7 @@ Polymer.register(this, {
       if (self[fname]) self[fname]();
     });
   },
-  parse: require("marked"),
+  parse: require("./components/marked/index.js"),
   editModeOn: function() {
     if (!this.editable) return;
     this.$.editableBody.style.height = (this.$.body.clientHeight) + "px"; 
@@ -121,4 +121,4 @@ Polymer.register(this, {
       e.preventDefault();
     }
   }
-});
+};

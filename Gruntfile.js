@@ -6,7 +6,7 @@ module.exports = function(grunt) {
       build: {
         options: {
           variables: {
-            "script": "<%= grunt.file.read('script.js') %>"
+            "proto": "<%= grunt.bundle %>"
           }
         },
         files: [
@@ -28,14 +28,14 @@ module.exports = function(grunt) {
     cp.spawn("node_modules/.bin/karma", ["start"], {stdio: "inherit"});
   });
 
-  grunt.registerTask("browserify", function() {
-    cp.exec("node_modules/.bin/browserify -r ./components/marked/index.js:marked > test/script.js", this.async());
+  grunt.registerTask("browseriglify", function() {
+    var done = this.async();
+    cp.exec("node_modules/.bin/browserify -r ./proto.js:proto | node_modules/.bin/uglifyjs -c -m", function(err, stdout) {
+      grunt.bundle = stdout;
+      done();
+    });
   });
 
-  grunt.registerTask("inline", function() {
-    cp.exec("node_modules/.bin/inliner component.html > index.html", this.async());
-  });
-
-  grunt.registerTask("build", ["replace"]);
-  grunt.registerTask("test", ["build", "browserify", "karma", "watch:build"]);
+  grunt.registerTask("build", ["browseriglify", "replace"]);
+  grunt.registerTask("test", ["build", "karma", "watch:build"]);
 }
