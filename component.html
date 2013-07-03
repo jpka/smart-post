@@ -1,4 +1,38 @@
 <element name="smart-post" attributes="model editable fixed onEditMode" on-dblclick="editModeOn" on-keyup="keyUp" on-foreign:update:body="parseBody" on-foreign:update:title="updateTitle">
+  <style polymer-scope="global">
+    @-webkit-keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+    @keyframes fadeOut {
+      from {
+        opacity: 1;
+      }
+      to {
+        opacity: 0;
+      }
+    }
+    @-webkit-keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
   <template>
     <style>
       @host {
@@ -46,15 +80,24 @@
       .clear {
         clear: both;
       }
-      .updeatable {
-        transition: opacity 1s;
+      .preAnimation {
+        -webkit-animation-name: fadeOut;
+        -webkit-animation-duration: 1s;
+        animation-name: fadeOut;
+        animation-duration: 1s;
+      }
+      .postAnimation {
+        -webkit-animation-name: fadeIn;
+        -webkit-animation-duration: 1s;
+        animation-name: fadeIn;
+        animation-duration: 1s;
       }
     </style>
     <button id="remove" on-click="remove" hidden?="{{!editable || fixed}}">X</button>
     <div class="clear"></div>
-    <h1 id="title" class="updeatable" contentEditable="{{onEditMode}}" on-keyup="updateTitleModel" on-keydown="preventNewLine" on-focusout="editModeOff" on-transitionend="titleTransitionEnded"></h1>
+    <h1 id="title" class="updeatable" contentEditable="{{onEditMode}}" on-keyup="updateTitleModel" on-keydown="preventNewLine" on-focusout="editModeOff"></h1>
     <div id="bodyContainer">
-      <div id="body" class="body updeatable" on-transitionend="bodyTransitionEnded" hidden?="{{onEditMode}}"></div>
+      <div id="body" class="body updeatable" hidden?="{{onEditMode}}"></div>
       <textarea id="editableBody" class="body" value="{{model.body}}" on-focusout="editModeOff" hidden?="{{!onEditMode}}"></textarea>
     </div>
     <button id="save" on-click="save" hidden>Save</button>

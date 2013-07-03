@@ -6,6 +6,11 @@ module.exports = {
     var self = this;
     this._ready = true;
     this.$.title.textContent = this.model.title;
+    this.shadowRoot.querySelectorAll(".updeatable").forEach(function(elem) {
+      elem.addEventListener("webkitAnimationEnd", self.animationEnded.bind(self));
+      elem.addEventListener("animationend", self.animationEnded.bind(self));
+      elem.addEventListener("update", self.onUpdate.bind(self));
+    });
     this.parseBody();
   },
 
@@ -57,6 +62,7 @@ module.exports = {
   },
   updateTitle: function() {
     this.$.title.textContent = this.model.title;
+    this.$.title.dispatchEvent(new CustomEvent("update", {bubbles: true}));
   },
   titleChanged: function(old) {
     if (!this._ready) return;
@@ -65,14 +71,9 @@ module.exports = {
       if (this.style.display === "none") {
         this.dispatchEvent(new CustomEvent("foreign:update:title"));
       } else {
-        this.$.title.style.opacity = 0;
+        this.$.title.classList.add("preAnimation");
       }
     }
-  },
-  titleTransitionEnded: function() {
-    if (this.$.title.style.opacity > 0) return;
-    this.dispatchEvent(new CustomEvent("foreign:update:title"));
-    this.$.title.style.opacity = 1;
   },
   bodyChanged: function(old) {
     if (!this._ready) return;
@@ -81,14 +82,17 @@ module.exports = {
       if (this.style.display === "none") {
         this.dispatchEvent(new CustomEvent("foreign:update:body"));
       } else {
-        this.$.body.style.opacity = 0;
+        this.$.body.classList.add("preAnimation");
       }
     }
   },
-  bodyTransitionEnded: function() {
-    if (this.$.body.style.opacity > 0) return;
-    this.dispatchEvent(new CustomEvent("foreign:update:body"));
-    this.$.body.style.opacity = 1;
+  animationEnded: function(e) {
+    if (e.target.classList.contains("preAnimation")) {
+      e.target.hidden = true;
+      this.dispatchEvent(new CustomEvent("foreign:update:" + e.target.id));
+    } else {
+      e.target.classList.remove("postAnimation");
+    }
   },
   parseBody: function() {
     if (!this._ready) return;
@@ -97,16 +101,23 @@ module.exports = {
       this.$.editableBody.value = this.model.body;
     }
     this.$.body.innerHTML = this.parse(this.$.editableBody.value);
-    this.fire("update");
+    this.$.body.dispatchEvent(new CustomEvent("update", {bubbles: true}));
+  },
+  onUpdate: function(e) {
+    if (e.target.classList.contains("preAnimation")) {
+      e.target.classList.remove("preAnimation");
+      e.target.hidden = false;
+      e.target.classList.add("postAnimation");
+    }
   },
   remove: function() {
     if (!this.parentNode) return;
     this.parentNode.removeChild(this);
-    this.fire("delete");
+    this.dispatchEvent(new CustomEvent("delete"));
   },
   save: function() {
     this.$.save.hidden = true;
-    this.fire("save");
+    this.dispatchEvent(new CustomEvent("save"));
   },
   keyUp: function(e) {
     switch (e.keyCode) {
