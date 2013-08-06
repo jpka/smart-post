@@ -1,6 +1,7 @@
 module.exports = {
   fixed: false,
   editable: false,
+  softUpdates: false,
 
   ready: function() {
     var self = this;
@@ -29,18 +30,16 @@ module.exports = {
   },
 
   observeModel: function() {
-    var self = this;
+    var self = this,
+    fn = "modelAttributeChanged";
 
     Object.keys(this._model).forEach(function(key) {
-      var fname = key + "Changed",
-      observer;
-
-      observer = new PathObserver(self._model, key, function(inNew, inOld) {
+      var observer = new PathObserver(self._model, key, function(inNew, inOld) {
         if (inNew === inOld) return;
-        if (typeof self[fname] === "function") self[fname](inOld);
+        self[fn](key, inOld);
       });
-      Polymer.registerObserver(self, "property", key, observer);
-      if (self[fname]) self[fname]();
+      //Polymer.registerObserver(self, "property", key, observer);
+      self[fn](key);
     });
   },
   parse: require("./components/marked/index.js"),
@@ -54,6 +53,11 @@ module.exports = {
     this.parseBody();
     this.onEditMode = false;
   },
+  update: function() {
+    this.updateTitle();
+    this.parseBody();
+    this.$.update.hidden = true;
+  },
   updateTitleModel: function() {
     while (this.$.title.firstElementChild) {
       this.$.title.removeChild(this.$.title.firstElementChild);
@@ -64,31 +68,23 @@ module.exports = {
     this.$.title.textContent = this.model.title;
     this.$.title.dispatchEvent(new CustomEvent("update", {bubbles: true}));
   },
-  titleChanged: function(old) {
+  modelAttributeChanged: function(key, old) {
     if (!this._ready) return;
-    this.$.save.hidden = !old || !this.model.title || this.model.title === "";
-    if (!this.onEditMode) {
-      if (this.style.display === "none") {
-        this.dispatchEvent(new CustomEvent("foreign:update:title"));
-      } else {
-        this.$.title.classList.add("preAnimation");
-      }
+    this.$.save.hidden = !this.onEditMode || !old || !this.model[key] || this.model[key] === "";
+    if (this.onEditMode) return;
+
+    if (old && this.softUpdates) {
+      this.$.update.hidden = false;
+      return;
     }
-  },
-  bodyChanged: function(old) {
-    if (!this._ready) return;
-    this.$.save.hidden = !old || !this.model.body || this.model.body === "";
-    if (!this.onEditMode) {
-      if (this.style.display === "none") {
-        this.dispatchEvent(new CustomEvent("foreign:update:body"));
-      } else {
-        this.$.body.classList.add("preAnimation");
-      }
+    if (this.style.display === "none" || !old) {
+      this.dispatchEvent(new CustomEvent("foreign:update:" + key));
+    } else {
+      this.$[key].classList.add("preAnimation");
     }
   },
   animationEnded: function(e) {
     if (e.target.classList.contains("preAnimation")) {
-      e.target.hidden = true;
       this.dispatchEvent(new CustomEvent("foreign:update:" + e.target.id));
     } else {
       e.target.classList.remove("postAnimation");
@@ -105,19 +101,18 @@ module.exports = {
   },
   onUpdate: function(e) {
     if (e.target.classList.contains("preAnimation")) {
-      e.target.classList.remove("preAnimation");
-      e.target.hidden = false;
       e.target.classList.add("postAnimation");
+      e.target.classList.remove("preAnimation");
     }
   },
   remove: function() {
     if (!this.parentNode) return;
+    this.fire("delete");
     this.parentNode.removeChild(this);
-    this.dispatchEvent(new CustomEvent("delete"));
   },
   save: function() {
     this.$.save.hidden = true;
-    this.dispatchEvent(new CustomEvent("save"));
+    this.fire("save");
   },
   keyUp: function(e) {
     switch (e.keyCode) {

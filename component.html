@@ -1,4 +1,4 @@
-<element name="smart-post" attributes="model editable fixed onEditMode" on-dblclick="editModeOn" on-keyup="keyUp" on-foreign:update:body="parseBody" on-foreign:update:title="updateTitle">
+<polymer-element name="smart-post" attributes="model editable fixed onEditMode softUpdates" on-dblclick="editModeOn" on-keyup="keyUp" on-foreign:update:body="parseBody" on-foreign:update:title="updateTitle">
   <style polymer-scope="global">
     @-webkit-keyframes fadeOut {
       from {
@@ -39,8 +39,6 @@
         smart-post {
           position: relative;
           display: block;
-          width: 600px;
-          margin: 20px;
           padding: 5px;
         }
       }
@@ -49,10 +47,11 @@
       }
       .body {
         min-height: 2em;
-        width: 100%;
+        width: 98%;
         height: 100%;
       }
       #title {
+        width: 98%;
         margin-top: 0px;
         min-height: 1em;
       }
@@ -95,17 +94,18 @@
     </style>
     <button id="remove" on-click="remove" hidden?="{{!editable || fixed}}">X</button>
     <div class="clear"></div>
-    <h1 id="title" class="updeatable" contentEditable="{{onEditMode}}" on-keyup="updateTitleModel" on-keydown="preventNewLine" on-focusout="editModeOff"></h1>
+    <h1 id="title" class="updeatable" contentEditable?="{{onEditMode}}" on-keyup="updateTitleModel" on-keydown="preventNewLine" on-focusout="editModeOff"></h1>
     <div id="bodyContainer">
       <div id="body" class="body updeatable" hidden?="{{onEditMode}}"></div>
       <textarea id="editableBody" class="body" value="{{model.body}}" on-focusout="editModeOff" hidden?="{{!onEditMode}}"></textarea>
     </div>
     <button id="save" on-click="save" hidden>Save</button>
+    <button id="update" on-click="update" hidden>The post has been modified, click to update</button>
     <div class="clear"></div>
   </template>
   <script>
     @@proto
 
-    Polymer.register(this, require("proto"));
+    Polymer("smart-post", require("proto"));
   </script>
-</element>
+</polymer-element>

@@ -15,10 +15,12 @@
     <smart-post id="post" class="post" editable="true" model="{'title': 'title', 'body': 'Holis'}"></smart-post>
     <smart-post id="empty" class="post" editable="true"></smart-post>
     <smart-post id="hidden" style="display:none;" class="post" editable="true"></smart-post>
+    <smart-post id="deferred" class="post"></smart-post>
     <script>
       setTimeout(function() {
         document.querySelector("#hidden").model = {'title': 'title', 'body': 'Holis'};
         document.querySelector("#hidden").style.display = "block";
+        document.querySelector("#deferred").model = {'title': 'title', 'body': 'Holis'};
       }, 2000);
     </script>
   </body>
